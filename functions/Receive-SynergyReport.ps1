@@ -1,4 +1,4 @@
-<# 
+<#
 .Synopsis
    Command to Run a Synergy Report
 .DESCRIPTION
@@ -26,7 +26,7 @@
    $cred = Get-Credential; $cc = New-Object System.Net.CookieContainer; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -CookieContainer $cc; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -CookieContainer $cc
    A CookieContainer (AKA a Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same cookie container are treated as a single login.
 .EXAMPLE
-   $params = @{ SynergyUri = "paloverde.apscc.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ SynergyUri = "https://synergy.school.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Receive-SynergyReport {
     [CmdletBinding()]
@@ -51,7 +51,7 @@ function Receive-SynergyReport {
         # Uri
         [System.Uri]
         [Alias("SynergyUri")]
-        $Uri = "https://paloverde.apscc.org",
+        $Uri,
 
         #ReportFileName
         [string]$ReportFileName = "Main",
@@ -73,7 +73,7 @@ function Receive-SynergyReport {
     $uri = $Uri.AbsoluteUri + "service/RTCommunication.asmx"
     $proxy = New-WebServiceProxy -Uri $uri
     $proxy.CookieContainer = $CookieContainer
-    
+
 
     ### STEP 2 use returned JobID to check report processing status ###
     $paramReportStatus = "<ReportStatus><JOBID>$jobId</JOBID></ReportStatus>"
@@ -90,10 +90,10 @@ function Receive-SynergyReport {
     Write-Progress -Activity "Running Synergy Report..." -Status "Recieving Report" -PercentComplete 75
     # $FilesList = $statusXML.REPORTSTATUS.RESULT_FILE_GROUP.RESULT_FILE
     Write-Verbose $statusXML.InnerXml
-    
+
     # Currently returning the CVS results of one file only.  May revise to return zip file of multiple files #
     #Write-Information ([string]::Join(", ", $FilesList.'#text'))
-    
+
     switch ($outputFormat) {
         {$_ -in 'PDF', 'TIFF', 'EXCEL', 'XML', 'TXT'} {$encodeB64 = 'Y'; Write-Warning "file is Base64 encoded"}
         {$_ -in 'HTML', 'RTF', 'CSV'} {$encodeB64 = 'N'}
@@ -105,7 +105,7 @@ function Receive-SynergyReport {
     $v = "Sending:" + $paramReportResult
     Write-Verbose $v
 
-  
+
     [xml]$resultXML = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportResult", $paramReportResult )
     $result = $resultXML.REPORTRESULT.RESULT.InnerText
 
@@ -136,7 +136,7 @@ function Receive-SynergyReport {
         'XML' {
             $enc0 = [System.Text.Encoding]::ASCII
             $encU = [System.Text.Encoding]::Unicode
-        
+
             $b = [System.Convert]::FromBase64String($result)
             $f = $enc0.GetString( [System.Text.Encoding]::Convert($encU, $enc0, $b))
             [xml]$x = $f.Substring(1)
@@ -144,11 +144,11 @@ function Receive-SynergyReport {
         }
         Default {
             $result = $resultXML.REPORTRESULT.RESULT.InnerText
-            $data = $result 
+            $data = $result
         }
     }
 
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
     return $data
-    
-} 
+
+}

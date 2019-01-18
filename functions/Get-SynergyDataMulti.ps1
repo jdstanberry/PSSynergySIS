@@ -1,4 +1,4 @@
-<# 
+<#
 .Synopsis
    Command to Run a Synergy Report and return an object
 .DESCRIPTION
@@ -28,7 +28,7 @@
    $cred = Get-Credential; $ws = New-Object Microsoft.PowerShell.Commands.WebRequestSession; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -WebSession $ws; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -WebSession $ws
    A WebRequestSession (with Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same WebSession are treated as a single login.
 .EXAMPLE
-   $params = @{ Uri = "paloverde.apscc.org";Credential= Get-Credential }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ Uri = "https://paloverde.apscc.org";Credential= Get-Credential }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Get-SynergyDataMulti {
     [CmdletBinding()]
@@ -58,11 +58,11 @@ function Get-SynergyDataMulti {
         # Uri
         [System.Uri]
         [Alias("SynergyUri")]
-        $Uri = "https://paloverde.apscc.org",
+        $Uri,
 
         # SchoolYear
         [string]$SchoolYear,
-        
+
         # School
         [string]$School,
 
@@ -97,7 +97,7 @@ function Get-SynergyDataMulti {
 
     )
     begin {
-        
+
         $SynergyParams = @{
             'Credential'      = $Credential ;
             'CookieContainer' = $CookieContainer ;
@@ -124,20 +124,20 @@ function Get-SynergyDataMulti {
         # }
         # Update-TypeData @TypeData -Force
     }
-    
+
     process {
-        foreach ($ReportItem in $ReportID) {  
-            
+        foreach ($ReportItem in $ReportID) {
+
             #Call Invoke-SynergyReport to return WebRequestResponseObject
             $result = Invoke-SynergyReport @SynergyParams -ReportID $ReportItem -ReportOptions $ReportOptions
             $resultXML = [xml](([xml]$result.Content).DocumentElement.InnerText)
-            
+
             $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
             $dataCount = (@($data)).Count
-            
+
             if (!$Name) {$Name = $ReportItem}
             Write-Information "Synergy Report $ReportItem returned $dataCount records of type $Name"
-            
+
             if ($AsHashTable) {
                 $finalHash.Add($Name, $data)
             }
@@ -153,7 +153,7 @@ function Get-SynergyDataMulti {
             }
         }
     }
-            
+
     end {
         if ($AsHashTable) {
             return $finalHash

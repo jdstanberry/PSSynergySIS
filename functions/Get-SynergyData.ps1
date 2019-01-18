@@ -1,4 +1,4 @@
-<# 
+<#
 .Synopsis
    Command to Run a Synergy Report
 .DESCRIPTION
@@ -26,7 +26,7 @@
    $cred = Get-Credential; $cc = New-Object System.Net.CookieContainer; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -CookieContainer $cc; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -CookieContainer $cc
    A CookieContainer (AKA a Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same cookie container are treated as a single login.
 .EXAMPLE
-   $params = @{ SynergyUri = "paloverde.apscc.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ SynergyUri = "https://synergy.school.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Get-SynergyData {
     [CmdletBinding()]
@@ -55,11 +55,11 @@ function Get-SynergyData {
         # Uri
         [System.Uri]
         [Alias("SynergyUri")]
-        $Uri = "https://paloverde.apscc.org",
+        $Uri,
 
         # SchoolYear
         [string]$SchoolYear,
-        
+
         # School
         [string]$School,
 
@@ -107,9 +107,9 @@ function Get-SynergyData {
 
     $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
     $dataCount = (@($data)).Count
-    
+
     Write-Information "Synergy Report $ReportID returned $dataCount records of type $itemsType"
-    
+
     return $data
-    
-} 
+
+}

@@ -1,4 +1,4 @@
-<# 
+<#
 .Synopsis
    Command to Run a Synergy Report
 .DESCRIPTION
@@ -26,7 +26,7 @@
    $cred = Get-Credential; $cc = New-Object System.Net.CookieContainer; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -CookieContainer $cc; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -CookieContainer $cc
    A CookieContainer (AKA a Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same cookie container are treated as a single login.
 .EXAMPLE
-   $params = @{ SynergyUri = "paloverde.apscc.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ SynergyUri = "https://synergy.school.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Invoke-SynergyReport
 {
@@ -56,11 +56,11 @@ function Invoke-SynergyReport
         # Uri
         [System.Uri]
         [Alias("SynergyUri")]
-        $Uri = "https://paloverde.apscc.org",
+        $Uri,
 
         # SchoolYear
         [string]$SchoolYear,
-        
+
         # School
         [string]$School,
 
@@ -92,18 +92,18 @@ function Invoke-SynergyReport
     #$proxy.CookieContainer = $cc
     #$handle = "Revelation.Reports"
     #$method = "ReportExecute"
-    
-    
+
+
     ### using here strings to keep the XML readable
-    [xml]$opts = 
-    @"     
+    [xml]$opts =
+    @"
     <OPTION_GROUP>
     $( $ReportOptions.Keys | ForEach-Object {'<OPTION PROPERTY="{0}">{1}</OPTION>' -f $_, $ReportOptions.Item($_)  }
       )
     </OPTION_GROUP>
 "@
 
-    [xml]$reXML = 
+    [xml]$reXML =
     @"
     <ReportExecute>
      <ID>$ReportID</ID>
@@ -115,7 +115,7 @@ function Invoke-SynergyReport
     </ReportExecute>
 
 "@
-   ### STEP 1 Send Report Request ### 
+   ### STEP 1 Send Report Request ###
    $paramReportExecute = $reXML.OuterXml
 
     $Body = @{
@@ -134,9 +134,9 @@ function Invoke-SynergyReport
 
     #[xml]$requestXml = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportExecute", "$paramReportExecute")
     Write-Progress -Activity "Running Synergy Report..." -Status "Sending Report Request" -PercentComplete 25
-    $requestResponse = Invoke-WebRequest @Params 
+    $requestResponse = Invoke-WebRequest @Params
     $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
-    
+
     if ($requestXml.REPORTEXECUTE.MESSAGE)
     {
         Throw $requestXml.REPORTEXECUTE.MESSAGE
@@ -181,10 +181,10 @@ function Invoke-SynergyReport
     Write-Progress -Activity "Running Synergy Report..." -Status "Recieving Report" -PercentComplete 75
     #$FilesList = $statusXML.REPORTSTATUS.RESULT_FILE_GROUP.RESULT_FILE
     Write-Verbose $statusXML.InnerXml
-    
+
     # Currently returning the CVS results of one file only.  May revise to return zip file of multiple files #
     #Write-Information ([string]::Join(", ", $FilesList.'#text'))
-    
+
     switch ($outputFormat)
     {
         {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Warning "file is Base64 encoded"}
@@ -220,16 +220,5 @@ function Invoke-SynergyReport
     # return WebRequestResult object
     return $resultResponse
 
-    
-} 
 
-
-
-# $cred = Get-Credential -UserName "jdstanberry" -Message "enter Synergy password" 
-# $params  = @{
-#     $ReportID = 'U-URX1'
-#     $outputFormat = 'CSV'
-# }
-# $myResult = Invoke-SynergyReport -ReportID 'U-URX1' -OutputFormat CSV -Credential $cred -Verbose
-    
-
+}

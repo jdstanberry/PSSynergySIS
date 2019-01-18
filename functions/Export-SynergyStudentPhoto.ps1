@@ -39,7 +39,7 @@ function Export-SynergyStudentPhoto
 
         # SynergyUri
         [string]
-        $SynergyUri = "paloverde.apscc.org",
+        $SynergyUri,
 
         # MakeArchive
         [ValidateSet("none","basic","eTrition","Follett")]
@@ -51,19 +51,19 @@ function Export-SynergyStudentPhoto
     )
 
     #$GradeFilter
-    Write-Progress -Activity "Running Report STU417" 
+    Write-Progress -Activity "Running Report STU417"
     $students = Get-SynergyData -ReportID STU417 -SynergyUri $Synergyuri -CookieContainer $CookieContainer -Credential $Credential -School $School
-    $data = $students | Where-Object Photo -NE '' 
+    $data = $students | Where-Object Photo -NE ''
     $data = $data | Where-Object Photo -NE 'Photo'
     $data = $data | Select-Object *,@{Name="PermID";Expression={$_.'Perm ID'}}, @{Name="PhotoUri";Expression={ "https://"+ $Synergyuri + "/" + [String]$_.Photo.Remove(($_.Photo.Length)-20,11) }}
     $data = $data | Select-Object *,@{Name="FileName";Expression={$_.PermID+".PNG"}}
-    $data | ForEach-Object  -Begin { $i=0 } -Process{   
+    $data | ForEach-Object  -Begin { $i=0 } -Process{
         $ProgressPreference = 'silentlyContinue'
-        Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path"+"\"+($_.FileName)) 
+        Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path"+"\"+($_.FileName))
         $ProgressPreference = 'Continue'
         Write-Progress -Activity "Downloading Student Photos" -PercentComplete ( $i/($data.Count)*100) -CurrentOperation ("Photo $i of "+($data.Count))
         $i=$i+1
-    } 
+    }
 
     $data | Select-Object -Property PermID, FileName | Export-Csv -Path "$Path\idlink.csv" -NoTypeInformation
     $data | Select-Object -Property @{Name="Barcode";Expression={"P "+($_PermID)}}, FileName | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | Out-File "$Path\idlink.txt"

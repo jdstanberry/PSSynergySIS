@@ -1,4 +1,4 @@
-﻿<# 
+﻿<#
 .Synopsis
    Command to Send XML to Synergy Web Service for SIS Data Import
 .DESCRIPTION
@@ -22,7 +22,7 @@ function Invoke-SynergyDataImport {
         # Uri
         [System.Uri]
         [Alias("SynergyUri")]
-        $Uri = "https://paloverde.apscc.org/training",
+        $Uri,
 
         # DataImportXML
         [xml]
@@ -49,7 +49,7 @@ function Invoke-SynergyDataImport {
 
     [xml]$reXML = $DataImportXML
 
-    ### STEP 1  Request ### 
+    ### STEP 1  Request ###
     $paramReportExecute = $reXML.OuterXml
 
     $Body = @{
@@ -74,5 +74,5 @@ function Invoke-SynergyDataImport {
     Write-Progress -Activity "Sending Synergy Data..." -Status "Sending Request" -PercentComplete 25
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
     return $data
-    
-} 
+
+}
