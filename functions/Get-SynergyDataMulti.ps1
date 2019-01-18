@@ -28,7 +28,7 @@
    $cred = Get-Credential; $ws = New-Object Microsoft.PowerShell.Commands.WebRequestSession; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -WebSession $ws; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -WebSession $ws
    A WebRequestSession (with Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same WebSession are treated as a single login.
 .EXAMPLE
-   $params = @{ Uri = "https://paloverde.apscc.org";Credential= Get-Credential }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ Uri = "https://synergy.school.org";Credential= Get-Credential }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Get-SynergyDataMulti {
     [CmdletBinding()]
