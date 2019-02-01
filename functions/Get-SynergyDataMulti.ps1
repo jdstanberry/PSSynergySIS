@@ -85,7 +85,7 @@ function Get-SynergyDataMulti {
         [System.Management.Automation.SwitchParameter]
         $PassThru,
 
-        #Name for the returned data, eg the type of items returned: sstudents, classes, etc.
+        #Name for the returned data, eg the type of items returned: students, classes, etc.
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string]
         [Alias("ItemsType")]
