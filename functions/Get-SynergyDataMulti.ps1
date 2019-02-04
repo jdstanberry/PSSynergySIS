@@ -48,10 +48,10 @@ function Get-SynergyDataMulti {
         $Credential = ( Get-Credential ),
 
         # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
+        # [System.Net.CookieContainer]
+        # $CookieContainer = [System.Net.CookieContainer]::new(),
 
-        #WebRequestSession
+        # WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
 
@@ -85,7 +85,7 @@ function Get-SynergyDataMulti {
         [System.Management.Automation.SwitchParameter]
         $PassThru,
 
-        #Name for the returned data, eg the type of items returned: sstudents, classes, etc.
+        #Name for the returned data, eg the type of items returned: students, classes, etc.
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string]
         [Alias("ItemsType")]
@@ -100,7 +100,7 @@ function Get-SynergyDataMulti {
 
         $SynergyParams = @{
             'Credential'      = $Credential ;
-            'CookieContainer' = $CookieContainer ;
+            # 'CookieContainer' = $CookieContainer ;
             'WebSession'      = $WebSession ;
             'Uri'             = $Uri ;
             'SchoolYear'      = $SchoolYear ;
