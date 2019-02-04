@@ -44,9 +44,9 @@ function Receive-SynergyReport {
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
+        #WebRequestSession
+        [Microsoft.PowerShell.Commands.WebRequestSession]
+        $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
 
         # Uri
         [System.Uri]
@@ -70,6 +70,7 @@ function Receive-SynergyReport {
     )
     $username = $Credential.UserName
     $password = $Credential.GetNetworkCredential().Password
+    $CookieContainer = $WebSession.Cookies
     $uri = $Uri.AbsoluteUri + "service/RTCommunication.asmx"
     $proxy = New-WebServiceProxy -Uri $uri
     $proxy.CookieContainer = $CookieContainer

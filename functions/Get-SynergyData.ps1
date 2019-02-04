@@ -44,10 +44,6 @@ function Get-SynergyData {
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
-
         #WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
@@ -90,7 +86,6 @@ function Get-SynergyData {
     $SynergyParams = @{
         'ReportID'        = $ReportID ;
         'Credential'      = $Credential ;
-        'CookieContainer' = $CookieContainer ;
         'WebSession'      = $WebSession ;
         'Uri'             = $Uri ;
         'SchoolYear'      = $SchoolYear ;

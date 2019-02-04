@@ -45,10 +45,6 @@ function Invoke-SynergyReport
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
-
         # WebSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
@@ -85,14 +81,6 @@ function Invoke-SynergyReport
     $username = $Credential.UserName
     $password = $Credential.GetNetworkCredential().Password
     $Uri = $Uri.AbsoluteUri + "service/RTCommunication.asmx/ProcessWebServiceRequest"
-    #$WebSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-    #$WebSession.Cookies = $CookieContainer
-    #$cc = $CookieContainer
-    #$proxy = New-WebServiceProxy -Uri $uri
-    #$proxy.CookieContainer = $cc
-    #$handle = "Revelation.Reports"
-    #$method = "ReportExecute"
-
 
     ### using here strings to keep the XML readable
     [xml]$opts =
