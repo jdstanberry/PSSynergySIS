@@ -47,7 +47,11 @@ function Get-SynergyDataMulti {
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        #WebRequestSession
+        # CookieContainer
+        # [System.Net.CookieContainer]
+        # $CookieContainer = [System.Net.CookieContainer]::new(),
+
+        # WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
 
@@ -96,6 +100,10 @@ function Get-SynergyDataMulti {
 
         $SynergyParams = @{
             'Credential'      = $Credential ;
+<<<<<<< HEAD
+=======
+            # 'CookieContainer' = $CookieContainer ;
+>>>>>>> e86b2cb6b601069db9b0137012cc067ebd46bc34
             'WebSession'      = $WebSession ;
             'Uri'             = $Uri ;
             'SchoolYear'      = $SchoolYear ;
