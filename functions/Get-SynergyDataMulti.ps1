@@ -100,10 +100,7 @@ function Get-SynergyDataMulti {
 
         $SynergyParams = @{
             'Credential'      = $Credential ;
-<<<<<<< HEAD
-=======
             # 'CookieContainer' = $CookieContainer ;
->>>>>>> e86b2cb6b601069db9b0137012cc067ebd46bc34
             'WebSession'      = $WebSession ;
             'Uri'             = $Uri ;
             'SchoolYear'      = $SchoolYear ;
