@@ -120,7 +120,6 @@ function Invoke-SynergyReport
         WebSession = $WebSession
     }
 
-    #[xml]$requestXml = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportExecute", "$paramReportExecute")
     Write-Progress -Activity "Running Synergy Report..." -Status "Sending Report Request" -PercentComplete 25
     $requestResponse = Invoke-WebRequest @Params
     $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
@@ -131,7 +130,7 @@ function Invoke-SynergyReport
     }
 
     $jobId = $requestXml.REPORTEXECUTE.JOBID
-    Write-Verbose $jobId
+    Write-Verbose "Report queued with jobId: $jobId"
 
     ### STEP 2 use returned JobID to check report processing status ###
     $paramReportStatus = "<ReportStatus><JOBID>$jobId</JOBID></ReportStatus>"
@@ -153,7 +152,6 @@ function Invoke-SynergyReport
 
     $status = "WAITING"
     Do {
-        #[xml]$statusXML = $proxy.ProcessWebServiceRequest($username, $password , "Revelation.Reports", "ReportStatus", $paramReportStatus )
         $statusResponse = Invoke-WebRequest @Params
         $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
         Write-Verbose $statusXML
@@ -170,7 +168,7 @@ function Invoke-SynergyReport
     #$FilesList = $statusXML.REPORTSTATUS.RESULT_FILE_GROUP.RESULT_FILE
     Write-Verbose $statusXML.InnerXml
 
-    # Currently returning the CVS results of one file only.  May revise to return zip file of multiple files #
+    # Currently returning the CVS results of one file only.  May revise to return array of multiple files #
     #Write-Information ([string]::Join(", ", $FilesList.'#text'))
 
     switch ($outputFormat)
@@ -199,10 +197,7 @@ function Invoke-SynergyReport
         WebSession = $WebSession
     }
 
-    #[xml]$resultXML = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportResult", $paramReportResult )
-    # $result = $resultXML.REPORTRESULT.RESULT.InnerText
     $resultResponse = Invoke-WebRequest @Params
-    #$resultXML = [xml](([xml]$resultResponse.Content).DocumentElement.InnerText)
 
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
     # return WebRequestResult object
