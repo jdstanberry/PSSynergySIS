@@ -1,14 +1,14 @@
 <#
 .Synopsis
-   Command to Run a Synergy Report
+   Command to Run a Synergy Report and return an object
 .DESCRIPTION
-   Uses Synergy Web Services to run a synergy CSV report and return the results as an array.
+   Uses Synergy Web Services to run a synergy CSV report and return the results as an array contained in a results object.
 .PARAMETER ReportID
     The ReportID of a Built-in Synergy report such as STU408 or a User-defined report such as U-STC-STAFF
 .PARAMETER Credential
     Powershell Credential such as from Get-Credential.  Use a Synergy username and password.
-.PARAMETER CookieContainer
-    Optional.  Pass a CookieContainer object to use with multiple Get-SynergyReport commands.
+.PARAMETER WebSession
+    Optional.  Pass a WebRequestSession object to use with multiple Get-SynergyReport commands.
 .PARAMETER Uri
     The Uri of the Synergy server.
 .PARAMETER School
@@ -17,16 +17,18 @@
     Optional.  Four digit school year.
 .PARAMETER ReportFileName
     Optional Name of file to return if report has more than one.  Defaults to "Main".
+.PARAMETER Name
+    Optional a title to use to identity the report results
 .PARAMETER ReportOptions
     Optional.  Hashtable of key/value pair for options specific to a particualar report.
     For example $Options = @{AsOfDate="8/3/2016"; TeacherID="Badge Num"; TeacherUserName="Abbreviated Name" }; Get-SynergyReport -ReportOptions $Options ...
 .EXAMPLE
-   Get-SynergyReport -ReportID STU408 -Credential (Get-Credential)
+   Get-SynergyReportMulti -ReportID STU408 -Credential (Get-Credential)
 .EXAMPLE
-   $cred = Get-Credential; $cc = New-Object System.Net.CookieContainer; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -CookieContainer $cc; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -CookieContainer $cc
-   A CookieContainer (AKA a Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same cookie container are treated as a single login.
+   $cred = Get-Credential; $ws = New-Object Microsoft.PowerShell.Commands.WebRequestSession; $rpt1 = Get-SynergyReport -ReportID U-GSDS5 -Credential $cred -WebSession $ws; $rpt2 = Get-SynergyReport -ReportID U-GSDS4 -Credential $cred -WebSession $ws
+   A WebRequestSession (with Session Cookie) can be passed as a parameter to allow running multiple reports using the same web services session.  Synergy will not allow multiple sessions from the same user within 3 seconds of each other.  All requests using the same WebSession are treated as a single login.
 .EXAMPLE
-   $params = @{ SynergyUri = "https://synergy.school.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
+   $params = @{ Uri = "https://synergy.school.org";Credential= Get-Credential }; Get-SynergyReport -ReportID STU408 @params
 #>
 function Get-SynergyData {
     [CmdletBinding()]
@@ -35,16 +37,17 @@ function Get-SynergyData {
     Param
     (
         # Report ID e.g. STU408
-        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory,
+            ValueFromPipelineByPropertyName = $true)]
         [String]
-        $ReportID = "STU804",
+        $ReportID,
 
         # Credential
         [ValidateNotNullOrEmpty()]
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        #WebRequestSession
+        # WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
 
@@ -63,48 +66,82 @@ function Get-SynergyData {
         [string]$ReportFileName = "Main",
 
         #ReportOptions
-        [hashtable]$ReportOptions = @{},
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [hashtable]
+        $ReportOptions = @{},
 
         #OutputFormat
         [ValidateSet("CSV", "XML")]
         [string]$outputFormat = "CSV",
 
-        #OutFile
-        [String]$OutFile,
-
         #PassThru
         [System.Management.Automation.SwitchParameter]
         $PassThru,
 
-        #itemsType
+        #Name for the returned data, eg the type of items returned: students, classes, etc.
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string]
-        $itemsType
+        [Alias("ItemsType")]
+        $Name,
+
+        # Returns Data as a hash table
+        [System.Management.Automation.SwitchParameter]
+        $AsHashTable
 
     )
+    begin {
 
+        $SynergyParams = @{
+            'Credential'      = $Credential
+            'WebSession'      = $WebSession
+            'Uri'             = $Uri
+            'SchoolYear'      = $SchoolYear
+            'School'          = $School
+            'ReportFileName'  = $ReportFileName
+            'OutputFormat'    = $outputFormat
+            'OutFile'         = $OutFile
+        }
+        $finalHash = [ordered]@{ LastRun = Get-Date }
 
-    $SynergyParams = @{
-        'ReportID'        = $ReportID ;
-        'Credential'      = $Credential ;
-        'WebSession'      = $WebSession ;
-        'Uri'             = $Uri ;
-        'SchoolYear'      = $SchoolYear ;
-        'School'          = $School ;
-        'ReportFileName'  = $ReportFileName ;
-        'ReportOptions'   = $ReportOptions ;
-        'OutputFormat'    = $outputFormat ;
-        'OutFile'         = $OutFile ;
+        $TypeData = @{
+            TypeName = 'My.SynergyResponse'
+            DefaultDisplayPropertySet = 'Name', 'ReportID', 'LastRun', 'ItemCount'
+        }
+        Update-TypeData @TypeData -Force
     }
 
-    #Call Invoke-SynergyReport to return WebRequestResponseObject
-    $result = Invoke-SynergyReport @SynergyParams
-    $resultXML = [xml](([xml]$result.Content).DocumentElement.InnerText)
+    process {
+        $ReportItem = $ReportID
 
-    $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
-    $dataCount = (@($data)).Count
+            #Call Invoke-SynergyReport to return WebRequestResponseObject
+            $result = Invoke-SynergyReport @SynergyParams -ReportID $ReportItem -ReportOptions $ReportOptions
+            $resultXML = [xml](([xml]$result.Content).DocumentElement.InnerText)
 
-    Write-Information "Synergy Report $ReportID returned $dataCount records of type $itemsType"
+            $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
+            $dataCount = (@($data)).Count
 
-    return $data
+            if (!$Name) {$Name = $ReportItem}
+            Write-Information "Synergy Report $ReportItem returned $dataCount records of type $Name"
 
+            if ($AsHashTable) {
+                $finalHash.Add($Name, $data)
+            }
+            else {
+                return [PSCustomObject]@{
+                    PSTypeName = 'My.SynergyResponse'
+                    Name = $Name
+                    ReportID = $ReportItem
+                    LastRun = Get-Date -DisplayHint DateTime
+                    ItemCount = @($data).Count
+                    Content   = $data
+                }
+            }
+
+    }
+
+    end {
+        if ($AsHashTable) {
+            return $finalHash
+        }
+    }
 }
