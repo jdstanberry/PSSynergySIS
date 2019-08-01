@@ -43,7 +43,7 @@ function Get-ReportXMLResult {
             # $rdr = $x.REV_REPORT.REV_DATA_ROOT.ChildNodes.Where({$_.name -notlike "REV*"})
             # $labels =  $x.REV_REPORT.REV_DATA_DEF
             # $data = $rdr | ConvertTo-Csv | ConvertFrom-Csv
-            $data = $x
+            $data = ConvertFrom-SynergyXml -xml $x
         }
         Default {
             $data = $result
@@ -53,4 +53,30 @@ function Get-ReportXMLResult {
     #Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
     return $data
 
+}
+
+function ConvertFrom-SynergyXml {
+    param (
+        [xml]$xml
+    )
+    $nodes = $xml | Select-Xml "//REV_LABEL_GROUP/*"
+    $headers = foreach ($node in $nodes) {
+        [PSCustomObject]@{
+            LocalName = $node.Node.LocalName
+            Label = $node.Node.Label
+            Order = [int]$node.Node.ORDER
+        }
+    }
+
+    $dataNodes = $xml | Select-Xml "//REV_DATA_ROOT/*[not(self::REV_TIME)][not(self::REV_DATE)]"
+    $a = [System.Collections.ArrayList]@()
+    foreach ($i in $dataNodes) {
+        $dat = $i.Node
+        $x = [PSCustomObject]@{}
+        foreach ($h in $headers){
+            $x | Add-Member -MemberType NoteProperty -Name $h.Label -Value $dat.($h.LocalName)
+        }
+        $null = $a.Add($x)
+    }
+    return $a
 }
