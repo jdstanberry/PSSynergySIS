@@ -40,9 +40,10 @@ function Get-ReportXMLResult {
             $b = [System.Convert]::FromBase64String($result)
             $f = $enc0.GetString( [System.Text.Encoding]::Convert($encU, $enc0, $b))
             [xml]$x = $f.Substring(1)
-            $rdr = $x.REV_REPORT.REV_DATA_ROOT.ChildNodes.Where({$_.name -notlike "REV*"})
-            $data = $rdr | ConvertTo-Csv | ConvertFrom-Csv
-            # $data = $x
+            # $rdr = $x.REV_REPORT.REV_DATA_ROOT.ChildNodes.Where({$_.name -notlike "REV*"})
+            # $labels =  $x.REV_REPORT.REV_DATA_DEF
+            # $data = $rdr | ConvertTo-Csv | ConvertFrom-Csv
+            $data = $x
         }
         Default {
             $data = $result
