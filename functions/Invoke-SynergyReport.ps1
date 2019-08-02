@@ -173,7 +173,7 @@ function Invoke-SynergyReport
 
     switch ($outputFormat)
     {
-        {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Warning "file is Base64 encoded"}
+        {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Verbose "file is Base64 encoded"}
         {$_ -in 'HTML','RTF','CSV'} {$encodeB64 = 'N'}
         Default {$encodeB64 = 'N'}
     }
