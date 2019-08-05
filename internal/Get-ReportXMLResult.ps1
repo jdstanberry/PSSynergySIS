@@ -60,6 +60,15 @@ function ConvertFrom-SynergyXml {
         [xml]$xml
     )
     $nodes = $xml | Select-Xml "//REV_LABEL_GROUP/*"
+
+    For ($i = 0; $i -lt $nodes.Count; $i++) {
+        if ($i -eq 0) { Continue } #Skip first column.
+        # If in any previous column, give it a generic header name
+        if ($nodes[0..($i - 1)].Node.Label -contains $nodes[$i].Node.Label) {
+            $nodes[$i].Node.Label = $nodes[$i].Node.LocalName
+        }
+    }
+
     $headers = foreach ($node in $nodes) {
         [PSCustomObject]@{
             LocalName = $node.Node.LocalName
