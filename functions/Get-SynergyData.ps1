@@ -72,7 +72,7 @@ function Get-SynergyData {
 
         #OutputFormat
         [ValidateSet("CSV", "XML")]
-        [string]$outputFormat = "CSV",
+        [string]$outputFormat = "XML",
 
         #PassThru
         [System.Management.Automation.SwitchParameter]
