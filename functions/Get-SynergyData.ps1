@@ -115,7 +115,8 @@ function Get-SynergyData {
 
             #Call Invoke-SynergyReport to return WebRequestResponseObject
             $result = Invoke-SynergyReport @SynergyParams -ReportID $ReportItem -ReportOptions $ReportOptions
-            $resultXML = [xml](([xml]$result.Content).DocumentElement.InnerText)
+            # $resultXML = [xml](([xml]$result.Content).DocumentElement.InnerText)
+            $resultXML = [xml]$result.string.'#text'
 
             $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
             $dataCount = (@($data)).Count

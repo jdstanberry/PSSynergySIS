@@ -121,8 +121,9 @@ function Invoke-SynergyReport
     }
 
     Write-Progress -Activity "Running Synergy Report..." -Status "Sending Report Request" -PercentComplete 25
-    $requestResponse = Invoke-WebRequest @Params
-    $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
+    $requestResponse = Invoke-RestMethod @Params
+    # $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
+    $requestXml = [xml]$requestResponse.string.'#text'
 
     if ($requestXml.REPORTEXECUTE.MESSAGE)
     {
@@ -152,8 +153,9 @@ function Invoke-SynergyReport
 
     $status = "WAITING"
     Do {
-        $statusResponse = Invoke-WebRequest @Params
-        $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
+        $statusResponse = Invoke-RestMethod @Params
+        # $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
+        $statusXML = [xml]$statusResponse.string.'#text'
         Write-Verbose $statusXML
         if ($statusXML.REPORTSTATUS.STATE -like "Error") {
             Throw $statusXML.REPORTSTATUS.MESSAGE
@@ -197,10 +199,10 @@ function Invoke-SynergyReport
         WebSession = $WebSession
     }
 
-    $resultResponse = Invoke-WebRequest @Params
+    $resultResponse = Invoke-RestMethod @Params
 
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
-    # return WebRequestResult object
+    # return RestMethod Result object
     return $resultResponse
 
 
