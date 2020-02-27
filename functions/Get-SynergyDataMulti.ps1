@@ -47,10 +47,6 @@ function Get-SynergyDataMulti {
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        # [System.Net.CookieContainer]
-        # $CookieContainer = [System.Net.CookieContainer]::new(),
-
         # WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
@@ -78,9 +74,6 @@ function Get-SynergyDataMulti {
         [ValidateSet("CSV", "XML")]
         [string]$outputFormat = "CSV",
 
-        #OutFile
-        [String]$OutFile,
-
         #PassThru
         [System.Management.Automation.SwitchParameter]
         $PassThru,
@@ -99,15 +92,14 @@ function Get-SynergyDataMulti {
     begin {
 
         $SynergyParams = @{
-            'Credential'      = $Credential ;
-            # 'CookieContainer' = $CookieContainer ;
-            'WebSession'      = $WebSession ;
-            'Uri'             = $Uri ;
-            'SchoolYear'      = $SchoolYear ;
-            'School'          = $School ;
-            'ReportFileName'  = $ReportFileName ;
-            'OutputFormat'    = $outputFormat ;
-            'OutFile'         = $OutFile ;
+            'Credential'      = $Credential
+            'WebSession'      = $WebSession
+            'Uri'             = $Uri
+            'SchoolYear'      = $SchoolYear
+            'School'          = $School
+            'ReportFileName'  = $ReportFileName
+            'OutputFormat'    = $outputFormat
+            'OutFile'         = $OutFile
         }
         $finalHash = [ordered]@{ LastRun = Get-Date }
 
@@ -116,13 +108,6 @@ function Get-SynergyDataMulti {
             DefaultDisplayPropertySet = 'Name', 'ReportID', 'LastRun', 'ItemCount'
         }
         Update-TypeData @TypeData -Force
-        # $TypeData = @{
-        #     TypeName = 'My.SynergyResponse'
-        #     MemberType = 'AliasProperty'
-        #     MemberName = 'Content'
-        #     Value = 'Items'
-        # }
-        # Update-TypeData @TypeData -Force
     }
 
     process {

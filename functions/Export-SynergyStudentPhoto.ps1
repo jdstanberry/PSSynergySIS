@@ -33,9 +33,9 @@ function Export-SynergyStudentPhoto
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
+        #WebRequestSession
+        [Microsoft.PowerShell.Commands.WebRequestSession]
+        $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
 
         # SynergyUri
         [string]
@@ -52,7 +52,7 @@ function Export-SynergyStudentPhoto
 
     #$GradeFilter
     Write-Progress -Activity "Running Report STU417"
-    $students = Get-SynergyData -ReportID STU417 -SynergyUri $Synergyuri -CookieContainer $CookieContainer -Credential $Credential -School $School
+    $students = Get-SynergyData -ReportID STU417 -SynergyUri $Synergyuri -WebSession $WebSession -Credential $Credential -School $School
     $data = $students | Where-Object Photo -NE ''
     $data = $data | Where-Object Photo -NE 'Photo'
     $data = $data | Select-Object *,@{Name="PermID";Expression={$_.'Perm ID'}}, @{Name="PhotoUri";Expression={ "https://"+ $Synergyuri + "/" + [String]$_.Photo.Remove(($_.Photo.Length)-20,11) }}

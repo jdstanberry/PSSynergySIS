@@ -45,10 +45,6 @@ function Invoke-SynergyReport
         [System.Management.Automation.PSCredential]
         $Credential = ( Get-Credential ),
 
-        # CookieContainer
-        [System.Net.CookieContainer]
-        $CookieContainer = [System.Net.CookieContainer]::new(),
-
         # WebSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
         $WebSession = [Microsoft.PowerShell.Commands.WebRequestSession]::new(),
@@ -85,14 +81,6 @@ function Invoke-SynergyReport
     $username = $Credential.UserName
     $password = $Credential.GetNetworkCredential().Password
     $Uri = $Uri.AbsoluteUri + "service/RTCommunication.asmx/ProcessWebServiceRequest"
-    #$WebSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-    #$WebSession.Cookies = $CookieContainer
-    #$cc = $CookieContainer
-    #$proxy = New-WebServiceProxy -Uri $uri
-    #$proxy.CookieContainer = $cc
-    #$handle = "Revelation.Reports"
-    #$method = "ReportExecute"
-
 
     ### using here strings to keep the XML readable
     [xml]$opts =
@@ -132,10 +120,10 @@ function Invoke-SynergyReport
         WebSession = $WebSession
     }
 
-    #[xml]$requestXml = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportExecute", "$paramReportExecute")
     Write-Progress -Activity "Running Synergy Report..." -Status "Sending Report Request" -PercentComplete 25
-    $requestResponse = Invoke-WebRequest @Params
-    $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
+    $requestResponse = Invoke-RestMethod @Params
+    # $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
+    $requestXml = [xml]$requestResponse.string.'#text'
 
     if ($requestXml.REPORTEXECUTE.MESSAGE)
     {
@@ -143,7 +131,7 @@ function Invoke-SynergyReport
     }
 
     $jobId = $requestXml.REPORTEXECUTE.JOBID
-    Write-Verbose $jobId
+    Write-Verbose "Report queued with jobId: $jobId"
 
     ### STEP 2 use returned JobID to check report processing status ###
     $paramReportStatus = "<ReportStatus><JOBID>$jobId</JOBID></ReportStatus>"
@@ -165,9 +153,9 @@ function Invoke-SynergyReport
 
     $status = "WAITING"
     Do {
-        #[xml]$statusXML = $proxy.ProcessWebServiceRequest($username, $password , "Revelation.Reports", "ReportStatus", $paramReportStatus )
-        $statusResponse = Invoke-WebRequest @Params
-        $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
+        $statusResponse = Invoke-RestMethod @Params
+        # $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
+        $statusXML = [xml]$statusResponse.string.'#text'
         Write-Verbose $statusXML
         if ($statusXML.REPORTSTATUS.STATE -like "Error") {
             Throw $statusXML.REPORTSTATUS.MESSAGE
@@ -182,12 +170,12 @@ function Invoke-SynergyReport
     #$FilesList = $statusXML.REPORTSTATUS.RESULT_FILE_GROUP.RESULT_FILE
     Write-Verbose $statusXML.InnerXml
 
-    # Currently returning the CVS results of one file only.  May revise to return zip file of multiple files #
+    # Currently returning the CVS results of one file only.  May revise to return array of multiple files #
     #Write-Information ([string]::Join(", ", $FilesList.'#text'))
 
     switch ($outputFormat)
     {
-        {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Warning "file is Base64 encoded"}
+        {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Verbose "file is Base64 encoded"}
         {$_ -in 'HTML','RTF','CSV'} {$encodeB64 = 'N'}
         Default {$encodeB64 = 'N'}
     }
@@ -211,13 +199,10 @@ function Invoke-SynergyReport
         WebSession = $WebSession
     }
 
-    #[xml]$resultXML = $proxy.ProcessWebServiceRequest($username, $password, "Revelation.Reports", "ReportResult", $paramReportResult )
-    # $result = $resultXML.REPORTRESULT.RESULT.InnerText
-    $resultResponse = Invoke-WebRequest @Params
-    #$resultXML = [xml](([xml]$resultResponse.Content).DocumentElement.InnerText)
+    $resultResponse = Invoke-RestMethod @Params
 
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
-    # return WebRequestResult object
+    # return RestMethod Result object
     return $resultResponse
 
 
