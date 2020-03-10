@@ -3,6 +3,19 @@
    Command to Send XML to Synergy Web Service for SIS Data Import
 .DESCRIPTION
    Uses Synergy Web Services to send data for import.
+.EXAMPLE
+    Invoke-SynergyDataImport -Credential Get-Credential -DataImportXML $xml
+.EXAMPLE
+    C:\PS>
+    Another example of how to use this cmdlet
+.PARAMETER InputObject
+    Specifies the object to be processed.  You can also pipe the objects to this command.
+.OUTPUTS
+    Output from this cmdlet (if any)
+.NOTES
+    General notes
+.COMPONENT
+    PSSynergySIS
 #>
 function Invoke-SynergyDataImport {
     [CmdletBinding()]

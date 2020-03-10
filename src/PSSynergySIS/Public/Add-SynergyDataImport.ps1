@@ -4,9 +4,9 @@
 .DESCRIPTION
    Long description
 .EXAMPLE
-   Example of how to use this cmdlet
+   Add-SynergyDataImport -InputFormat GridCodes -ImportObject
 .EXAMPLE
-   Another example of how to use this cmdlet
+   Add-SynergyDataImport -InputFormat StudentBus -ImputObject
 #>
 function Add-SynergyDataImport {
     [CmdletBinding()]

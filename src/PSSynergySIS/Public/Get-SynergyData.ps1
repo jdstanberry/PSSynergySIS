@@ -2,7 +2,7 @@
 .Synopsis
    Command to Run a Synergy Report and return an object
 .DESCRIPTION
-   Uses Synergy Web Services to run a synergy CSV report and return the results as an array contained in a results object.
+   Uses Synergy Web Services to run a synergy XML report and return the results as an array contained in a results object.
 .PARAMETER ReportID
     The ReportID of a Built-in Synergy report such as STU408 or a User-defined report such as U-STC-STAFF
 .PARAMETER Credential
