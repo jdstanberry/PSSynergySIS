@@ -49,16 +49,16 @@ function Invoke-SynergyDataImport {
     $paramReportExecute = $reXML.OuterXml
 
     $Body = @{
-        userID = $username
-        password = $password
+        userID               = $username
+        password             = $password
         webServiceHandleName = $Handle
-        methodName = $MethodName
-        paramStr = $paramReportExecute
+        methodName           = $MethodName
+        paramStr             = $paramReportExecute
     }
     $Params = @{
-        Uri = $Uri
-        Method = 'post'
-        Body = $Body
+        Uri        = $Uri
+        Method     = 'post'
+        Body       = $Body
         WebSession = $WebSession
     }
 

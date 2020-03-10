@@ -68,7 +68,7 @@ function Get-SynergyDataMulti {
         #ReportOptions
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [hashtable]
-        $ReportOptions = @{},
+        $ReportOptions = @{ },
 
         #OutputFormat
         [ValidateSet("CSV", "XML")]
@@ -92,19 +92,19 @@ function Get-SynergyDataMulti {
     begin {
 
         $SynergyParams = @{
-            'Credential'      = $Credential
-            'WebSession'      = $WebSession
-            'Uri'             = $Uri
-            'SchoolYear'      = $SchoolYear
-            'School'          = $School
-            'ReportFileName'  = $ReportFileName
-            'OutputFormat'    = $outputFormat
-            'OutFile'         = $OutFile
+            'Credential'     = $Credential
+            'WebSession'     = $WebSession
+            'Uri'            = $Uri
+            'SchoolYear'     = $SchoolYear
+            'School'         = $School
+            'ReportFileName' = $ReportFileName
+            'OutputFormat'   = $outputFormat
+            'OutFile'        = $OutFile
         }
         $finalHash = [ordered]@{ LastRun = Get-Date }
 
         $TypeData = @{
-            TypeName = 'My.SynergyResponse'
+            TypeName                  = 'My.SynergyResponse'
             DefaultDisplayPropertySet = 'Name', 'ReportID', 'LastRun', 'ItemCount'
         }
         Update-TypeData @TypeData -Force
@@ -120,20 +120,19 @@ function Get-SynergyDataMulti {
             $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
             $dataCount = (@($data)).Count
 
-            if (!$Name) {$Name = $ReportItem}
+            if (!$Name) { $Name = $ReportItem }
             Write-Information "Synergy Report $ReportItem returned $dataCount records of type $Name"
 
             if ($AsHashTable) {
                 $finalHash.Add($Name, $data)
-            }
-            else {
+            } else {
                 return [PSCustomObject]@{
                     PSTypeName = 'My.SynergyResponse'
-                    Name = $Name
-                    ReportID = $ReportItem
-                    LastRun = Get-Date -DisplayHint DateTime
-                    ItemCount = @($data).Count
-                    Content   = $data
+                    Name       = $Name
+                    ReportID   = $ReportItem
+                    LastRun    = Get-Date -DisplayHint DateTime
+                    ItemCount  = @($data).Count
+                    Content    = $data
                 }
             }
         }

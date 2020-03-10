@@ -28,15 +28,14 @@
 .EXAMPLE
    $params = @{ SynergyUri = "https://synergy.school.org";Credential= Get-Credential;CookieContainer=New-Object System.Net.CookieContainer; }; Get-SynergyReport -ReportID STU408 @params
 #>
-function Invoke-SynergyReport
-{
+function Invoke-SynergyReport {
     [CmdletBinding()]
     [Alias()]
     [OutputType([Array])]
     Param
     (
         # Report ID e.g. STU408
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $ReportID = "STU804",
 
@@ -61,14 +60,14 @@ function Invoke-SynergyReport
         [string]$School,
 
         #ReportFileName
-        [string]$ReportFileName="Main",
+        [string]$ReportFileName = "Main",
 
         #ReportOptions
-        [hashtable]$ReportOptions = @{},
+        [hashtable]$ReportOptions = @{ },
 
         #OutputFormat
-        [ValidateSet("CSV","XML","PDF","TIFF","EXCEL",'TXT',"HTML","RTF")]
-        [string]$OutputFormat="CSV",
+        [ValidateSet("CSV", "XML", "PDF", "TIFF", "EXCEL", 'TXT', "HTML", "RTF")]
+        [string]$OutputFormat = "CSV",
 
         #OutFile
         [String]$OutFile,
@@ -103,20 +102,20 @@ function Invoke-SynergyReport
     </ReportExecute>
 
 "@
-   ### STEP 1 Send Report Request ###
-   $paramReportExecute = $reXML.OuterXml
+    ### STEP 1 Send Report Request ###
+    $paramReportExecute = $reXML.OuterXml
 
     $Body = @{
-        userID = $username
-        password = $password
+        userID               = $username
+        password             = $password
         webServiceHandleName = 'Revelation.Reports'
-        methodName = 'ReportExecute'
-        paramStr = $paramReportExecute
+        methodName           = 'ReportExecute'
+        paramStr             = $paramReportExecute
     }
     $Params = @{
-        Uri = $Uri
-        Method = 'post'
-        Body = $Body
+        Uri        = $Uri
+        Method     = 'post'
+        Body       = $Body
         WebSession = $WebSession
     }
 
@@ -125,8 +124,7 @@ function Invoke-SynergyReport
     # $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
     $requestXml = [xml]$requestResponse.string.'#text'
 
-    if ($requestXml.REPORTEXECUTE.MESSAGE)
-    {
+    if ($requestXml.REPORTEXECUTE.MESSAGE) {
         Throw $requestXml.REPORTEXECUTE.MESSAGE
     }
 
@@ -137,16 +135,16 @@ function Invoke-SynergyReport
     $paramReportStatus = "<ReportStatus><JOBID>$jobId</JOBID></ReportStatus>"
 
     $Body = @{
-        userID = $username
-        password = $password
+        userID               = $username
+        password             = $password
         webServiceHandleName = 'Revelation.Reports'
-        methodName = 'ReportStatus'
-        paramStr = $paramReportStatus
+        methodName           = 'ReportStatus'
+        paramStr             = $paramReportStatus
     }
     $Params = @{
-        Uri = $Uri
-        Method = 'post'
-        Body = $Body
+        Uri        = $Uri
+        Method     = 'post'
+        Body       = $Body
         WebSession = $WebSession
     }
 
@@ -163,7 +161,7 @@ function Invoke-SynergyReport
         $status = $statusXML.REPORTSTATUS.STATE
         $message = $statusXML.REPORTSTATUS.MESSAGE
         Write-Progress -Activity "Running Synergy Report..." -Status $status -CurrentOperation $message -PercentComplete 50
-    }While(@("Waiting","InProgress") -contains $status )
+    }While (@("Waiting", "InProgress") -contains $status )
 
     ### STEP 3 Retrieve Completed Report ###
     Write-Progress -Activity "Running Synergy Report..." -Status "Recieving Report" -PercentComplete 75
@@ -173,11 +171,10 @@ function Invoke-SynergyReport
     # Currently returning the CVS results of one file only.  May revise to return array of multiple files #
     #Write-Information ([string]::Join(", ", $FilesList.'#text'))
 
-    switch ($outputFormat)
-    {
-        {$_ -in 'PDF','TIFF','EXCEL','XML','TXT'} {$encodeB64 = 'Y'; Write-Verbose "file is Base64 encoded"}
-        {$_ -in 'HTML','RTF','CSV'} {$encodeB64 = 'N'}
-        Default {$encodeB64 = 'N'}
+    switch ($outputFormat) {
+        { $_ -in 'PDF', 'TIFF', 'EXCEL', 'XML', 'TXT' } { $encodeB64 = 'Y'; Write-Verbose "file is Base64 encoded" }
+        { $_ -in 'HTML', 'RTF', 'CSV' } { $encodeB64 = 'N' }
+        Default { $encodeB64 = 'N' }
     }
 
 
@@ -186,16 +183,16 @@ function Invoke-SynergyReport
     Write-Verbose $v
 
     $Body = @{
-        userID = $username
-        password = $password
+        userID               = $username
+        password             = $password
         webServiceHandleName = 'Revelation.Reports'
-        methodName = 'ReportResult'
-        paramStr = $paramReportResult
+        methodName           = 'ReportResult'
+        paramStr             = $paramReportResult
     }
     $Params = @{
-        Uri = $Uri
-        Method = 'post'
-        Body = $Body
+        Uri        = $Uri
+        Method     = 'post'
+        Body       = $Body
         WebSession = $WebSession
     }
 

@@ -11,7 +11,7 @@ function Get-ReportXMLResult {
     switch ($outputFormat) {
         'CSV' {
             # Synergy sometimes returns CSV files with duplicate headers
-            $lineone = ($result -split '\n')[0] | ForEach-Object {$_ -replace '"', ''}
+            $lineone = ($result -split '\n')[0] | ForEach-Object { $_ -replace '"', '' }
             [array]$Headers = $lineone -split ","
             For ($i = 0; $i -lt $Headers.Count; $i++) {
                 if ($i -eq 0) { Continue } #Skip first column.
@@ -22,11 +22,11 @@ function Get-ReportXMLResult {
             }
             $fixed = $result | ConvertFrom-Csv -Header $Headers
             # $data = $fixed | Select-Object -Skip 1
-            $data = $fixed | Select-Object -Skip 1 | Where-Object {$_.PSObject.Properties.Value -ne ''}
+            $data = $fixed | Select-Object -Skip 1 | Where-Object { $_.PSObject.Properties.Value -ne '' }
         }
-        {$_ -in 'HTML', 'RTF'}
-        {$data = $result }
-        {$_ -in 'PDF', 'TIFF', 'EXCEL', 'TXT'} {
+        { $_ -in 'HTML', 'RTF' }
+        { $data = $result }
+        { $_ -in 'PDF', 'TIFF', 'EXCEL', 'TXT' } {
             $enc0 = [System.Text.Encoding]::ASCII
             $encU = [System.Text.Encoding]::Unicode
             $b = [System.Convert]::FromBase64String($result)
@@ -72,8 +72,8 @@ function ConvertFrom-SynergyXml {
     $headers = foreach ($node in $nodes) {
         [PSCustomObject]@{
             LocalName = $node.Node.LocalName
-            Label = $node.Node.Label
-            Order = [int]$node.Node.ORDER
+            Label     = $node.Node.Label
+            Order     = [int]$node.Node.ORDER
         }
     }
 
@@ -81,8 +81,8 @@ function ConvertFrom-SynergyXml {
     $a = [System.Collections.ArrayList]@()
     foreach ($i in $dataNodes) {
         $dat = $i.Node
-        $x = [PSCustomObject]@{}
-        foreach ($h in $headers){
+        $x = [PSCustomObject]@{ }
+        foreach ($h in $headers) {
             $x | Add-Member -MemberType NoteProperty -Name $h.Label -Value $dat.($h.LocalName)
         }
         $null = $a.Add($x)
