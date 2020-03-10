@@ -69,16 +69,18 @@ Description = 'Communicate with Synergy SIS through REST services.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = '*'
+# FunctionsToExport = '*'
+FunctionsToExport = @('Get-SynergyData', 'Get-SynergyDataMulti', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = '*'
+# CmdletsToExport = '*'
+CmdletsToExport   = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'New-SynergyDataImport', 'Get-SynergyDataMulti')
 
 # Variables to export from this module
 VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()

@@ -8,7 +8,7 @@
 .EXAMPLE
    Another example of how to use this cmdlet
 #>
-function New-SynergyDataImport {
+function Add-SynergyDataImport {
     [CmdletBinding()]
     [Alias()]
     [OutputType([int])]
