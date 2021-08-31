@@ -77,7 +77,7 @@ function Invoke-SynergyDataImport {
 
     #[xml]$requestXml = $proxy.ProcessWebServiceRequest($username, $password, $Handle, $MethodName, "$paramReportExecute")
     Write-Progress -Activity "Sending Synergy Data..." -Status "Sending Request" -PercentComplete 25
-    $requestResponse = Invoke-WebRequest @Params
+    $requestResponse = Invoke-RestMethod @Params
     # $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
     $requestXml = [xml]$requestResponse.string.'#text'
     $data = $requestXml.InnerXml

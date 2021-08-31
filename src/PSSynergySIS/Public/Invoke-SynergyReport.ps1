@@ -67,7 +67,7 @@ function Invoke-SynergyReport {
 
         #OutputFormat
         [ValidateSet("CSV", "XML", "PDF", "TIFF", "EXCEL", 'TXT', "HTML", "RTF")]
-        [string]$OutputFormat = "CSV",
+        [string]$OutputFormat = "XML",
 
         #OutFile
         [String]$OutFile,
@@ -200,7 +200,9 @@ function Invoke-SynergyReport {
 
     Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
     # return RestMethod Result object
-    return $resultResponse
+    $resultXML = [xml]$resultResponse.string.'#text'
+    $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
+    return $data
 
 
 }
