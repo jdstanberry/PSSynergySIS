@@ -45,7 +45,7 @@ function Get-SynergyData {
         # Credential
         [ValidateNotNullOrEmpty()]
         [System.Management.Automation.PSCredential]
-        $Credential = ( Get-Credential ),
+        $Credential,
 
         # WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
@@ -91,10 +91,12 @@ function Get-SynergyData {
     )
     begin {
 
+        $config = Get-SynergyConfig -BoundParameters $PSBoundParameters
+
         $SynergyParams = @{
-            'Credential'     = $Credential
+            'Credential'     = $config.Credential
             'WebSession'     = $WebSession
-            'Uri'            = $Uri
+            'Uri'            = $config.ServerUri
             'SchoolYear'     = $SchoolYear
             'School'         = $School
             'ReportFileName' = $ReportFileName

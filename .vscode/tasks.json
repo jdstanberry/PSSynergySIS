@@ -129,6 +129,15 @@
             "type": "shell",
             "problemMatcher": "$msCompile",
             "command": "Invoke-Build -Task InfraTest -File '${workspaceFolder}/src/PSSynergySIS.build.ps1'"
+        },
+        {
+            "label": "Publish to Local Repository",
+            "type": "shell",
+            "problemMatcher": "$msCompile",
+            "options": {
+                "cwd": "${workspaceFolder}/src/Artifacts/PSSynergySIS"
+            },
+            "command": "Publish-PSResource -Repository nuget-local -Path . -Verbose"
         }
 	]
 }

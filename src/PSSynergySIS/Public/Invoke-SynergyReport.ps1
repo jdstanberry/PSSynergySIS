@@ -42,7 +42,7 @@ function Invoke-SynergyReport {
         # Credential
         [ValidateNotNullOrEmpty()]
         [System.Management.Automation.PSCredential]
-        $Credential = ( Get-Credential ),
+        $Credential,
 
         # WebSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
@@ -75,8 +75,13 @@ function Invoke-SynergyReport {
         #PassThru
         [System.Management.Automation.SwitchParameter]
         $PassThru
-
     )
+
+    ### Pull Values from Configuration
+    $script:config = Get-SynergyConfig -BoundParameters $PSBoundParameters
+    $Uri = [Uri]$config.ServerUri
+    $Credential = $config.Credential
+
     $username = $Credential.UserName
     $password = $Credential.GetNetworkCredential().Password
     $Uri = $Uri.AbsoluteUri + "service/RTCommunication.asmx/ProcessWebServiceRequest"
