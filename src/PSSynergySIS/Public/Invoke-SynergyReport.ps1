@@ -123,8 +123,8 @@ function Invoke-SynergyReport {
         Body       = $Body
         WebSession = $WebSession
     }
-
-    Write-Progress -Activity "Running Synergy Report..." -Status "Sending Report Request" -PercentComplete 25
+    $activityMsg = "Running Synergy Report: {0,10}" -f $ReportID
+    Write-Progress -Activity $activityMsg -Status "Sending Report Request" -PercentComplete 25
     $requestResponse = Invoke-RestMethod @Params
     # $requestXml = [xml](([xml]$requestResponse.Content).DocumentElement.InnerText)
     $requestXml = [xml]$requestResponse.string.'#text'
@@ -165,11 +165,11 @@ function Invoke-SynergyReport {
         }
         $status = $statusXML.REPORTSTATUS.STATE
         $message = $statusXML.REPORTSTATUS.MESSAGE
-        Write-Progress -Activity "Running Synergy Report..." -Status $status -CurrentOperation $message -PercentComplete 50
+        Write-Progress -Activity $activityMsg -Status $status -CurrentOperation $message -PercentComplete 50
     }While (@("Waiting", "InProgress") -contains $status )
 
     ### STEP 3 Retrieve Completed Report ###
-    Write-Progress -Activity "Running Synergy Report..." -Status "Recieving Report" -PercentComplete 75
+    Write-Progress -Activity $activityMsg -Status "Recieving Report" -PercentComplete 75
     #$FilesList = $statusXML.REPORTSTATUS.RESULT_FILE_GROUP.RESULT_FILE
     Write-Verbose $statusXML.InnerXml
 
@@ -203,7 +203,7 @@ function Invoke-SynergyReport {
 
     $resultResponse = Invoke-RestMethod @Params
 
-    Write-Progress -Activity "Running Synergy Report..." -Completed -Status "All done." -PercentComplete 100
+    Write-Progress -Activity $activityMsg -Completed -Status "All done." -PercentComplete 100
     # return RestMethod Result object
     $resultXML = [xml]$resultResponse.string.'#text'
     $data = Get-ReportXMLResult -outputFormat $outputFormat -resultXML $resultXML
