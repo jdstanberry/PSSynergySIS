@@ -125,7 +125,8 @@ function Get-SynergyData {
         $dataCount = (@($data)).Count
 
         if (!$Name) { $Name = $ReportItem }
-        Write-Information "Synergy Report $ReportItem returned $dataCount records of type $Name"
+        $msgInfo = "Synergy Report {0,10} returned {1,5}  records of type {2}" -f $ReportItem, $dataCount, $Name
+        Write-Information $msgInfo
 
         if ($AsHashTable) {
             $finalHash.Add($Name, $data)
