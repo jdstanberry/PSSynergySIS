@@ -159,7 +159,7 @@ function Invoke-SynergyReport {
         $statusResponse = Invoke-RestMethod @Params
         # $statusXML = [xml](([xml]$statusResponse.Content).DocumentElement.InnerText)
         $statusXML = [xml]$statusResponse.string.'#text'
-        Write-Verbose $statusXML
+        Write-Verbose $statusXML.InnerXml
         if ($statusXML.REPORTSTATUS.STATE -like "Error") {
             Throw $statusXML.REPORTSTATUS.MESSAGE
         }

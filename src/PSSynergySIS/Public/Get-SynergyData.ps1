@@ -57,9 +57,11 @@ function Get-SynergyData {
         $Uri,
 
         # SchoolYear
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string]$SchoolYear,
 
         # School
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [string]$School,
 
         #ReportFileName
