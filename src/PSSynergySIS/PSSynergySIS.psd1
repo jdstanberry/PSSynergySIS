@@ -70,11 +70,11 @@ Description = 'Communicate with Synergy SIS through REST services.'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 # FunctionsToExport = '*'
-FunctionsToExport = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig')
+FunctionsToExport = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 # CmdletsToExport = '*'
-CmdletsToExport   = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig')
+CmdletsToExport   = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto')
 
 # Variables to export from this module
 VariablesToExport = '*'

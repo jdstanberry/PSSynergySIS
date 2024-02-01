@@ -29,7 +29,7 @@ function Export-SynergyStudentPhoto {
         # Credential
         [ValidateNotNullOrEmpty()]
         [System.Management.Automation.PSCredential]
-        $Credential = ( Get-Credential ),
+        $Credential,
 
         #WebRequestSession
         [Microsoft.PowerShell.Commands.WebRequestSession]
@@ -48,16 +48,29 @@ function Export-SynergyStudentPhoto {
         $School
     )
 
+    $config = Get-SynergyConfig -BoundParameters $PSBoundParameters
+
+        # $SynergyParams = @{
+        #     'Credential'     = $config.Credential
+        #     'WebSession'     = $WebSession
+        #     'Uri'            = $config.ServerUri
+        #     # 'SchoolYear'     = $SchoolYear
+        #     # 'School'         = $School
+        #     # 'ReportFileName' = $ReportFileName
+        #     'OutputFormat'   = "XML"
+        #     # 'OutFile'        = $OutFile
+        # }
+
     #$GradeFilter
     Write-Progress -Activity "Running Report STU417"
-    $students = Get-SynergyData -ReportID STU417 -SynergyUri $Synergyuri -WebSession $WebSession -Credential $Credential -School $School
-    $data = $students | Where-Object Photo -NE ''
+    $students = Get-SynergyData -ReportID STU417 -WebSession $WebSession
+    $data = $students.Content | Where-Object Photo -NE ''
     $data = $data | Where-Object Photo -NE 'Photo'
-    $data = $data | Select-Object *, @{Name = "PermID"; Expression = { $_.'Perm ID' } }, @{Name = "PhotoUri"; Expression = { "https://" + $Synergyuri + "/" + [String]$_.Photo.Remove(($_.Photo.Length) - 20, 11) } }
+    $data = $data | Select-Object *, @{Name = "PermID"; Expression = { $_.'Perm ID' } }, @{Name = "PhotoUri"; Expression = { $config.ServerUri + "/" + [String]$_.Photo.Remove(($_.Photo.Length) - 20, 11) } }
     $data = $data | Select-Object *, @{Name = "FileName"; Expression = { $_.PermID + ".PNG" } }
     $data | ForEach-Object  -Begin { $i = 0; $i++ } -Process {
         $ProgressPreference = 'silentlyContinue'
-        Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path" + "\" + ($_.FileName))
+        Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path" + "\" + ($_.FileName)) -WebSession $WebSession
         $ProgressPreference = 'Continue'
         Write-Progress -Activity "Downloading Student Photos" -PercentComplete ( $i/($data.Count)*100) -CurrentOperation ("Photo $i of " + ($data.Count))
         $i++
