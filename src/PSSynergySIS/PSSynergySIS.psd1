@@ -12,7 +12,7 @@
 RootModule = 'PSSynergySIS.psm1'
 
 # Version number of this module.
-ModuleVersion = '5.0.5'
+ModuleVersion = '5.0.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
