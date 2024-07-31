@@ -12,7 +12,7 @@
 RootModule = 'PSSynergySIS.psm1'
 
 # Version number of this module.
-ModuleVersion = '5.0.3'
+ModuleVersion = '5.0.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -70,11 +70,11 @@ Description = 'Communicate with Synergy SIS through REST services.'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 # FunctionsToExport = '*'
-FunctionsToExport = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto')
+FunctionsToExport = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto','ConvertFrom-SynergyXml')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 # CmdletsToExport = '*'
-CmdletsToExport   = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto')
+CmdletsToExport   = @('Get-SynergyData', 'Invoke-SynergyDataImport', 'Invoke-SynergyReport', 'Add-SynergyDataImport', 'Set-SynergyConfig', 'Get-SynergyConfig','Export-SynergyStudentPhoto','ConvertFrom-SynergyXml')
 
 # Variables to export from this module
 VariablesToExport = '*'
