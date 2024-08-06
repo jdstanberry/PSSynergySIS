@@ -50,16 +50,16 @@ function Export-SynergyStudentPhoto {
 
     $config = Get-SynergyConfig -BoundParameters $PSBoundParameters
 
-        # $SynergyParams = @{
-        #     'Credential'     = $config.Credential
-        #     'WebSession'     = $WebSession
-        #     'Uri'            = $config.ServerUri
-        #     # 'SchoolYear'     = $SchoolYear
-        #     # 'School'         = $School
-        #     # 'ReportFileName' = $ReportFileName
-        #     'OutputFormat'   = "XML"
-        #     # 'OutFile'        = $OutFile
-        # }
+    # $SynergyParams = @{
+    #     'Credential'     = $config.Credential
+    #     'WebSession'     = $WebSession
+    #     'Uri'            = $config.ServerUri
+    #     # 'SchoolYear'     = $SchoolYear
+    #     # 'School'         = $School
+    #     # 'ReportFileName' = $ReportFileName
+    #     'OutputFormat'   = "XML"
+    #     # 'OutFile'        = $OutFile
+    # }
 
     #$GradeFilter
     Write-Progress -Activity "Running Report STU417"
@@ -72,7 +72,7 @@ function Export-SynergyStudentPhoto {
         $ProgressPreference = 'silentlyContinue'
         Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path" + "\" + ($_.FileName)) -WebSession $WebSession
         $ProgressPreference = 'Continue'
-        Write-Progress -Activity "Downloading Student Photos" -PercentComplete ( $i/($data.Count)*100) -CurrentOperation ("Photo $i of " + ($data.Count))
+        Write-Progress -Activity "Downloading Student Photos" -PercentComplete ( $i / ($data.Count) * 100) -CurrentOperation ("Photo $i of " + ($data.Count))
         $i++
     }
 
