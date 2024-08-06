@@ -50,39 +50,41 @@ function Export-SynergyStudentPhoto {
 
     $config = Get-SynergyConfig -BoundParameters $PSBoundParameters
 
-    # $SynergyParams = @{
-    #     'Credential'     = $config.Credential
-    #     'WebSession'     = $WebSession
-    #     'Uri'            = $config.ServerUri
-    #     # 'SchoolYear'     = $SchoolYear
-    #     # 'School'         = $School
-    #     # 'ReportFileName' = $ReportFileName
-    #     'OutputFormat'   = "XML"
-    #     # 'OutFile'        = $OutFile
-    # }
-
-    #$GradeFilter
     Write-Progress -Activity "Running Report STU417"
     $students = Get-SynergyData -ReportID STU417 -WebSession $WebSession
     $data = $students.Content | Where-Object Photo -NE ''
     $data = $data | Where-Object Photo -NE 'Photo'
-    $data = $data | Select-Object *, @{Name = "PermID"; Expression = { $_.'Perm ID' } }, @{Name = "PhotoUri"; Expression = { $config.ServerUri + "/" + [String]$_.Photo.Remove(($_.Photo.Length) - 20, 11) } }
-    $data = $data | Select-Object *, @{Name = "FileName"; Expression = { $_.PermID + ".PNG" } }
+    $data = $data | ForEach-Object {
+        $photoPath = (( $_.Photo -split '_' ) | Select-Object -Index 0, 2) -join '_'
+        [PSCustomObject]@{
+            PermID   = $_.'Perm ID'
+            PhotoUri = $config.ServerUri + "/" + $photoPath
+            FileName = $_.'Perm ID' + ".PNG"
+            Barcode  = "P " + $_.'Perm ID'
+            ID       = $_.'Perm ID'
+        }
+    }
+
+    # $data = $data | Select-Object *, @{Name = "PermID"; Expression = { $_.'Perm ID' } }, @{Name = "PhotoUri"; Expression = { $config.ServerUri + "/" + [String]$_.Photo.Remove(($_.Photo.Length) - 20, 11) } }
+    # $data = $data | Select-Object *, @{Name = "FileName"; Expression = { $_.PermID + ".PNG" } }
     $data | ForEach-Object  -Begin { $i = 0; $i++ } -Process {
         $ProgressPreference = 'silentlyContinue'
         Invoke-WebRequest -Uri ($_.PhotoUri) -OutFile ("$Path" + "\" + ($_.FileName)) -WebSession $WebSession
         $ProgressPreference = 'Continue'
-        Write-Progress -Activity "Downloading Student Photos" -PercentComplete ( $i / ($data.Count) * 100) -CurrentOperation ("Photo $i of " + ($data.Count))
+        Write-Progress -Activity "Downloading Student Photos" -Status ("Photo $i of " + ($data.Count)) -PercentComplete ( $i / ($data.Count) * 100) -CurrentOperation ("Photo $i of " + ($data.Count))
         $i++
     }
 
     $data | Select-Object -Property PermID, FileName | Export-Csv -Path "$Path\idlink.csv" -NoTypeInformation
-    $data | Select-Object -Property @{Name = "Barcode"; Expression = { "P " + ($_PermID) } }, FileName | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | Out-File "$Path\idlink.txt"
-    switch ($MakeArchive) {
-        'basic' { $data[0..5000].FileName, 'idlink.csv' | Compress-Archive -DestinationPath "$Path\basic" -Force }
+    $data | Select-Object -Property PermID, FileName | Export-Csv -Path "$Path\etrition.csv" -NoTypeInformation -NoHeader
+    $data | Select-Object -Property Barcode, FileName | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | Out-File "$Path\idlink.txt"
 
-        'Follett' { $data[0..5000].FileName, 'idlink.txt' | Compress-Archive -DestinationPath "$Path\Follett" -Force }
+    switch ($MakeArchive) {
+        'basic' { $data[0..5000].FileName, 'idlink.csv', 'idlink.txt', 'etrition.csv' | Compress-Archive -DestinationPath "$Path\basic" -Force }
+
+        'Follett' { $data[0..5000].FileName, 'idlink.txt', 'etrition.csv' | Compress-Archive -DestinationPath "$Path\Follett" -Force }
         Default { }
     }
+
     Return $data[0..5000].FileName
 }

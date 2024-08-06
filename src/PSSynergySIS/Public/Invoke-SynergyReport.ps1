@@ -166,7 +166,12 @@ function Invoke-SynergyReport {
         $status = $statusXML.REPORTSTATUS.STATE
         $message = $statusXML.REPORTSTATUS.MESSAGE
         Write-Progress -Activity $activityMsg -Status $status -CurrentOperation $message -PercentComplete 50
+
     }While (@("Waiting", "InProgress") -contains $status )
+
+    if ($message -match "No data") {
+        return
+    }
 
     ### STEP 3 Retrieve Completed Report ###
     Write-Progress -Activity $activityMsg -Status "Recieving Report" -PercentComplete 75

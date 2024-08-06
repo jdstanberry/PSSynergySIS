@@ -42,14 +42,35 @@ function ConvertFrom-SynergyXml {
 
     # $dataNodes = $xml | Select-Xml "/REV_REPORT/REV_DATA_ROOT/*[contains(local-name(),'FB')]"
     $dataNodes = $xml | Select-Xml "/REV_REPORT/REV_DATA_ROOT/*[not(self::REV_TIME)][not(self::REV_DATE)]" | Select-Object -ExpandProperty Node
+
     $a = [System.Collections.ArrayList]@()
-    foreach ($i in $dataNodes) {
-        $dat = $i
-        $x = [PSCustomObject]@{ }
-        foreach ($h in $headers) {
-            $x | Add-Member -MemberType NoteProperty -Name $h.Label -Value $dat.($h.LocalName)
+    foreach ($dataNode in $dataNodes) {
+        $members = $dataNode | Get-Member -MemberType Property
+        $obj = [PSCustomObject]@{}
+        foreach ($member in $members) {
+            if ($dataNode.LocalName -eq 'ROW') {
+                [string]$NewLabel = $member.Name -replace '^.*?_'
+                $obj | Add-Member -MemberType NoteProperty -Name $NewLabel -Value $dataNode.($member.Name)
+            } else {
+                $header = $headers | Where-Object LocalName -EQ $member.Name
+                # [string]$NewLabel = $header.Label ?? $member.Name
+                $header | ForEach-Object {
+                    $obj | Add-Member -MemberType NoteProperty -Name $_.Label -Value $dataNode.($member.Name)
+                }
+            }
+            # $NewLabel ??= $member.Name
         }
-        $null = $a.Add($x)
+        $null = $a.Add($obj)
     }
+
+
+    # foreach ($i in $dataNodes) {
+    #     $dat = $i
+    #     $x = [PSCustomObject]@{ }
+    #     foreach ($h in $headers) {
+    #         $x | Add-Member -MemberType NoteProperty -Name $h.Label -Value $dat.($h.LocalName)
+    #     }
+    #     $null = $a.Add($x)
+    # }
     return $a
 }
